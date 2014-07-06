@@ -18,7 +18,7 @@ class StoresController < ApplicationController
   # POST /stores
   # POST /stores.json
   def create
-    @store = Store.new(params[:store])
+    @store = Store.new(store_params)
 
     if @store.save
       render json: @store, status: :created, location: @store
@@ -32,7 +32,7 @@ class StoresController < ApplicationController
   def update
     @store = Store.find(params[:id])
 
-    if @store.update(params[:store])
+    if @store.update(store_params)
       head :no_content
     else
       render json: @store.errors, status: :unprocessable_entity
@@ -46,5 +46,10 @@ class StoresController < ApplicationController
     @store.destroy
 
     head :no_content
+  end
+
+  protected
+  def store_params
+    params.permit(:number, :nombre, :warehouse_id, :merchant_id)
   end
 end

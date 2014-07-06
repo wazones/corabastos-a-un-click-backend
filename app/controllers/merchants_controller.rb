@@ -3,7 +3,7 @@ class MerchantsController < ApplicationController
   # GET /merchants.json
   def index
     @merchants = Merchant.all
-    render json: @merchants
+    render json: @merchants.to_json(:except => [ :profilePicture ])
   end
 
   # GET /merchants/1
@@ -11,13 +11,18 @@ class MerchantsController < ApplicationController
   def show
     @merchant = Merchant.find(params[:id])
     #@merchant.stores = Store.all
-    render json: @merchant.to_json(:include =>:stores)
+    render json: @merchant.to_json(:except => [ :profilePicture ], :include =>:stores)
   end
 
   # POST /merchants
   # POST /merchants.json
   def create
-    @merchant = Merchant.new(params[:merchant])
+    @merchant = Merchant.new(merchant_params)
+    #@merchant.profilePicture = params[:profilePicture].read
+    if(params.has_key?(:profilePicture))
+      @merchant.profilePicture = params[:profilePicture].read
+    end 
+    
 
     if @merchant.save
       render json: @merchant, status: :created, location: @merchant
@@ -30,8 +35,11 @@ class MerchantsController < ApplicationController
   # PATCH/PUT /merchants/1.json
   def update
     @merchant = Merchant.find(params[:id])
+    if(params.has_key?(:profilePicture))
+      @merchant.profilePicture = params[:profilePicture].read
+    end 
 
-    if @merchant.update(params[:merchant])
+    if @merchant.update(merchant_params)
       head :no_content
     else
       render json: @merchant.errors, status: :unprocessable_entity
@@ -45,5 +53,10 @@ class MerchantsController < ApplicationController
     @merchant.destroy
 
     head :no_content
+  end
+
+  protected
+  def merchant_params
+    params.permit(:user, :pass, :phone, :name, :rating)
   end
 end
