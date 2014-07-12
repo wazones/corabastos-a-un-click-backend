@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :warehouses, except: [:new, :edit]
   resources :stores, except: [:new, :edit]
   resources :merchants, except: [:new, :edit]
   # The priority is based upon order of creation: first created -> highest priority.
